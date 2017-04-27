@@ -1,7 +1,19 @@
 
-import java.awt.*;
-import java.awt.event.*;
-import java.sql.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Label;
+import java.awt.TextArea;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.swing.JTextField;
 
 
 /**
@@ -16,9 +28,10 @@ import java.sql.*;
  */
 public class DatabaseUserInterface extends java.applet.Applet implements ActionListener {
 
- private TextField mStat, m1, m2, m3;
+ private TextField mStat, m1, m2, m3, m4, m5, m6;
 TextArea mRes,mquery;
- private Button b1, b2, b3, b4,qsubmit;
+ private Button b1, b2, b3, b4,btn_submit,btn_add;
+ private Button btn_etudiant, btn_enseingnant, btn_salle, btn_matiere, btn_parcour, btn_seance;
  private static final long serialVersionUID = 1L; 
  Label mquery_label=new Label("Query results: ", Label.CENTER);
  Label input_label = new Label("Query results: ", Label.CENTER);
@@ -35,14 +48,21 @@ TextArea mRes,mquery;
 	 /**
 	  * Definition of text fields
 	  */
-     
+	 
+	
+	 
 	 setSize(1100,500);
 	 getParent().setLocation(100,100);
      mStat = new TextField(150);
      mStat.setEditable(false);
-//     m1 = new TextField(150);
-//     m2 = new TextField(150);
-//     m3 = new TextField(150);
+     
+     m1 = new TextField(150);
+     m2 = new TextField(150);
+     m3 = new TextField(150);
+     m4 = new TextField(150);
+     m5 = new TextField(150);
+     m6 = new TextField(150);
+     
      mquery = new TextArea(10,150);
      mRes = new TextArea(10,150);
      mRes.setEditable(false);
@@ -57,7 +77,15 @@ TextArea mRes,mquery;
      b2 = new Button("DISCONNECT");
      b3 = new Button("QUERY");
      b4 = new Button("INSERT");
-     qsubmit= new Button("Executer");
+     btn_enseingnant = new Button("Enseignant");
+     btn_etudiant = new Button("Etudiant");
+     btn_matiere = new Button("Matiere");
+     btn_parcour = new Button("Parcour");
+     btn_salle = new Button("Salle");
+     btn_seance = new Button("Seance");
+     
+     btn_submit= new Button("Executer");
+     btn_add = new Button("Ajouter");
      add(b1) ;
      add(b2) ;
      add(b3) ;
@@ -75,7 +103,11 @@ TextArea mRes,mquery;
 //     m2.setText("Age (e.g. 23)  - Please enter here!"); //According to the database schema
 //     m3.setText("Color of the eye (e.g. green) - Please enter here!");  //According to the database schema
      conn=null;
+     b2.setEnabled(false);
+     b3.setEnabled(false);
+     b4.setEnabled(false);
      setStatus("Waiting for user actions.");
+                
  }
  
  
@@ -117,20 +149,64 @@ TextArea mRes,mquery;
          insertDatabase();
      }
      
-     if (cause == qsubmit)
+     //Button execute dans querry
+     if (cause == btn_submit)
      {
-    	 try {
- 			st=conn.createStatement();
- 			String sql=mquery.getText();
- 			ResultSet rs=st.executeQuery(sql);
- 			mRes.setText(rs.toString());
- 		} catch (SQLException e) {
- 			setStatus("DATABASE CONNEXION PROBLEM !!");
- 			System.err.println(e.getMessage());
- 		}
- 		
-         
+    	 execute_query();         
      }
+     
+     //Button insertion enseignant
+     if (cause == btn_enseingnant)
+     {
+    	 remove_all();
+    	// m1.setInputPrompt("hint");
+    	 add(m1);
+    	 add(m2);
+     }
+     
+   //Button insertion etudiant
+     if (cause == btn_etudiant)
+     {
+    	 remove_all();
+    	 add(m1);
+    	 add(m2);
+    	 add(m3);
+    	 add(m4);
+     }
+
+   //Button insertion matiere
+     if (cause == btn_matiere)
+     {
+    	 remove_all();
+    	 add(m1);
+     }
+     
+   //Button insertion parcour
+     if (cause == btn_parcour)
+     {
+    	 remove_all();
+    	 add(m1);
+     }
+     
+   //Button insertion salle
+     if (cause == btn_salle)
+     {
+    	 remove_all();
+    	 add(m1);
+     }
+     
+   //Button insertion séance
+     if (cause == btn_seance)
+     {
+    	 remove_all();
+    	 add(m1);
+    	 add(m2);
+    	 add(m3);
+    	 add(m4);
+    	 add(m5);
+    	 add(m6);
+     }
+    
  }
  
 
@@ -147,6 +223,7 @@ private void setStatus(String text){
  * Procedure, where the database connection should be implemented. 
  */
 private void connectToDatabase(){
+	
 	try{
 		String URL = "jdbc:mysql://mysql.istic.univ-rennes1.fr/base_17011071";
 		String USER = "user_17011071";
@@ -154,6 +231,10 @@ private void connectToDatabase(){
 		Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection(URL, USER, PASS);
 		setStatus("Connected to the database");
+		b1.setEnabled(false);
+		b2.setEnabled(true);
+		b3.setEnabled(true);
+		b4.setEnabled(true);
 	} catch(Exception e){
 		System.err.println(e.getMessage());
 		setStatus("Connection failed");
@@ -166,10 +247,15 @@ private void connectToDatabase(){
  */
 private void disconnectFromDatabase(){
 	remove_all();
+	
 	try{
 		conn.close();
 		conn=null;
 	setStatus("Disconnected from the database");
+	b1.setEnabled(true);
+	b2.setEnabled(false);
+	b3.setEnabled(false);
+	b4.setEnabled(false);
 	} catch(Exception e){
 		System.err.println(e.getMessage());
 		setStatus("Disconnection failed");
@@ -194,8 +280,8 @@ private void queryDatabase(){
 		add(mquery_label);
 		add(mRes);
 		mRes.setText("Query results");
-		add(qsubmit);
-		qsubmit.addActionListener(this);
+		add(btn_submit);
+		btn_submit.addActionListener(this);
 		validate();
 				
 	}
@@ -214,16 +300,16 @@ private void insertDatabase(){
 	else
 	{
 	
-	try{
-		String name = m1.getText();
-		String age = m2.getText();
-		String color = m3.getText();
-		setStatus("Inserting --( " + name + ", " + age + ", " + color + " )-- to the database");
-		} catch(Exception e){
-			System.err.println(e.getMessage());
-			setStatus("Insertion failed");
-		}
-	
+		setStatus("Choisissez une table");
+		remove_all();
+		add(btn_seance);
+		add(btn_etudiant);
+		add(btn_enseingnant);
+		add(btn_matiere);
+		add(btn_salle);
+		add(btn_parcour);
+		validate();
+			
 	}
 	
 }
@@ -233,12 +319,46 @@ private void remove_all()
 	remove(mRes);
 	remove(mquery);
 	remove(mquery_label);
-	remove(qsubmit);
+	remove(btn_submit);
 	remove(input_label);
+	remove(m1);
+	remove(m2);
+	remove(m3);
+	remove(m4);
+	remove(m5);
+	remove(m6);
+	remove(btn_add);
 	
 	
-	//m1, m2, m3;
 	
+}
+
+
+private void execute_query()
+{
+	try {
+			st=conn.createStatement();
+			String sql=mquery.getText();
+			ResultSet rs=st.executeQuery(sql);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			mRes.setText("");
+			
+			for(int i=1;i<=rsmd.getColumnCount();i++)
+			mRes.append(rsmd.getColumnName(i)+"\t");
+			
+			while(rs.next())
+			{	
+				mRes.append("\n");
+				for(int i=1;i<=rsmd.getColumnCount();i++)
+				{
+					mRes.append(rs.getString(i)+"\t");
+				}
+			}
+		} catch (SQLException e) {
+			setStatus("DATABASE CONNEXION PROBLEM !!");
+			System.err.println(e.getMessage());
+		}
+		
 }
 
 

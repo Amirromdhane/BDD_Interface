@@ -1,0 +1,59 @@
+[1mdiff --git a/bin/DatabaseUserInterface.class b/bin/DatabaseUserInterface.class[m
+[1mindex 0303eb1..a2df470 100644[m
+Binary files a/bin/DatabaseUserInterface.class and b/bin/DatabaseUserInterface.class differ
+[1mdiff --git a/src/DatabaseUserInterface.java b/src/DatabaseUserInterface.java[m
+[1mindex 396652e..4f74ee4 100644[m
+[1m--- a/src/DatabaseUserInterface.java[m
+[1m+++ b/src/DatabaseUserInterface.java[m
+[36m@@ -75,6 +75,7 @@[m [mTextArea mRes,mquery;[m
+ //     m2.setText("Age (e.g. 23)  - Please enter here!"); //According to the database schema[m
+ //     m3.setText("Color of the eye (e.g. green) - Please enter here!");  //According to the database schema[m
+      conn=null;[m
+[32m+[m[32m     b2.setEnabled(false);[m
+      setStatus("Waiting for user actions.");[m
+  }[m
+  [m
+[36m@@ -123,7 +124,20 @@[m [mTextArea mRes,mquery;[m
+  			st=conn.createStatement();[m
+  			String sql=mquery.getText();[m
+  			ResultSet rs=st.executeQuery(sql);[m
+[31m- 			mRes.setText(rs.toString());[m
+[32m+[m[41m [m			[32mResultSetMetaData rsmd = rs.getMetaData();[m
+[32m+[m[41m [m			[32mmRes.setText("");[m
+[32m+[m[41m 			[m
+[32m+[m[41m [m			[32mfor(int i=1;i<=rsmd.getColumnCount();i++)[m
+[32m+[m[41m [m			[32mmRes.append(rsmd.getColumnName(i)+"\t");[m
+[32m+[m[41m 			[m
+[32m+[m[41m [m			[32mwhile(rs.next())[m
+[32m+[m[41m [m			[32m{[m[41m	[m
+[32m+[m[41m [m				[32mmRes.append("\n");[m
+[32m+[m[41m [m				[32mfor(int i=1;i<=rsmd.getColumnCount();i++)[m
+[32m+[m[41m [m				[32m{[m
+[32m+[m[41m [m					[32mmRes.append(rs.getString(i)+"\t");[m
+[32m+[m[41m [m				[32m}[m
+[32m+[m[41m [m			[32m}[m
+  		} catch (SQLException e) {[m
+  			setStatus("DATABASE CONNEXION PROBLEM !!");[m
+  			System.err.println(e.getMessage());[m
+[36m@@ -147,6 +161,8 @@[m [mprivate void setStatus(String text){[m
+  * Procedure, where the database connection should be implemented. [m
+  */[m
+ private void connectToDatabase(){[m
+[32m+[m	[32mb1.setEnabled(false);[m
+[32m+[m	[32mb2.setEnabled(true);[m
+ 	try{[m
+ 		String URL = "jdbc:mysql://mysql.istic.univ-rennes1.fr/base_17011071";[m
+ 		String USER = "user_17011071";[m
+[36m@@ -166,6 +182,10 @@[m [mprivate void connectToDatabase(){[m
+  */[m
+ private void disconnectFromDatabase(){[m
+ 	remove_all();[m
+[32m+[m	[32mb1.setEnabled(true);[m
+[32m+[m	[32mb2.setEnabled(false);[m
+[32m+[m[41m	[m
+[32m+[m[41m	[m
+ 	try{[m
+ 		conn.close();[m
+ 		conn=null;[m
+warning: LF will be replaced by CRLF in src/DatabaseUserInterface.java.
+The file will have its original line endings in your working directory.
