@@ -34,10 +34,10 @@ TextArea mRes,mquery;
  private Button btn_etudiant, btn_enseingnant, btn_salle, btn_matiere, btn_parcour, btn_seance;
  private static final long serialVersionUID = 1L; 
  Label mquery_label=new Label("Query results: ", Label.CENTER);
- Label input_label = new Label("Query results: ", Label.CENTER);
+ Label input_label = new Label("Input fields: ", Label.CENTER);
  Connection conn;
  Statement st;
- 
+ private String table;
  
  /**
   * This procedure is called when the Applet is initialized.
@@ -159,52 +159,83 @@ TextArea mRes,mquery;
      if (cause == btn_enseingnant)
      {
     	 remove_all();
-    	// m1.setInputPrompt("hint");
+    	 insertDatabase();
+    	 m1.setText("Nom"); // m1.setInputPrompt("hint"); 
     	 add(m1);
     	 add(m2);
+    	 add(btn_add);
+    	 table="Enseignant";
+    	 validate();
      }
      
    //Button insertion etudiant
      if (cause == btn_etudiant)
      {
     	 remove_all();
+    	 insertDatabase();
     	 add(m1);
     	 add(m2);
     	 add(m3);
     	 add(m4);
+    	 add(btn_add);
+    	 table="Etudiant";
+    	 validate();
      }
 
    //Button insertion matiere
      if (cause == btn_matiere)
      {
     	 remove_all();
+    	 insertDatabase();
     	 add(m1);
+    	 add(btn_add);
+    	 table="Matiere";
+    	 validate();
      }
      
    //Button insertion parcour
      if (cause == btn_parcour)
      {
     	 remove_all();
+    	 insertDatabase();
     	 add(m1);
+    	 add(btn_add);
+    	 table="Parcours";
+    	 validate();
      }
      
    //Button insertion salle
      if (cause == btn_salle)
      {
     	 remove_all();
+    	 insertDatabase();
     	 add(m1);
+    	 add(btn_add);
+    	 table="Salle";
+    	 validate();
      }
      
    //Button insertion séance
      if (cause == btn_seance)
      {
     	 remove_all();
+    	 insertDatabase();
     	 add(m1);
     	 add(m2);
     	 add(m3);
     	 add(m4);
     	 add(m5);
     	 add(m6);
+    	 add(btn_add);
+    	 table="Seance";
+    	 validate();
+     }
+     
+     
+   //Button Executer l'insertion
+     if (cause == btn_add)
+     {
+    	 execute_insertion();
      }
     
  }
@@ -308,6 +339,12 @@ private void insertDatabase(){
 		add(btn_matiere);
 		add(btn_salle);
 		add(btn_parcour);
+		btn_enseingnant.addActionListener(this);
+		btn_etudiant.addActionListener(this);
+		btn_matiere.addActionListener(this);
+		btn_parcour.addActionListener(this);
+		btn_salle.addActionListener(this);
+		btn_seance.addActionListener(this);
 		validate();
 			
 	}
@@ -328,6 +365,12 @@ private void remove_all()
 	remove(m5);
 	remove(m6);
 	remove(btn_add);
+	remove(btn_enseingnant);
+	remove(btn_etudiant);
+	remove(btn_matiere);
+	remove(btn_parcour);
+	remove(btn_salle);
+	remove(btn_seance);
 	
 	
 	
@@ -361,6 +404,20 @@ private void execute_query()
 		
 }
 
+private void execute_insertion()
+{
+	try {
+		st=conn.createStatement();
+		String sql="Insert into "+table+" values()";
+		st.executeUpdate(sql);
+		setStatus("Insertion to table '"+table+"' successful");
+	} catch (SQLException e) {
+		setStatus("Error Insertion");
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
 
 
 }
