@@ -1,6 +1,8 @@
 
 import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Label;
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -13,7 +15,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.swing.JTextField;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
 
 
 /**
@@ -28,13 +32,29 @@ import javax.swing.JTextField;
  */
 public class DatabaseUserInterface extends java.applet.Applet implements ActionListener {
 
+private static final long serialVersionUID = 1L; 
+
+// textfields & textareas
  private TextField mStat, m1, m2, m3, m4, m5, m6;
-TextArea mRes,mquery;
+ private TextArea mRes,mquery;
+ 
+// buttons
  private Button b1, b2, b3, b4,btn_submit,btn_add;
  private Button btn_etudiant, btn_enseingnant, btn_salle, btn_matiere, btn_parcour, btn_seance;
- private static final long serialVersionUID = 1L; 
+ 
+ // Labels
  Label mquery_label=new Label("Query results: ", Label.CENTER);
  Label input_label = new Label("Input fields: ", Label.CENTER);
+ Label lname= new Label ("Name : ");
+ 
+ // JcombBoxs
+ JComboBox liste_enseignat = new JComboBox();
+ JComboBox liste_salle = new JComboBox();
+ 
+// Panels
+JPanel query_panel;
+ 
+// Database variables
  Connection conn;
  Statement st;
  private String table;
@@ -45,34 +65,24 @@ TextArea mRes,mquery;
   */
  public void init ()
  {    
-	 /**
-	  * Definition of text fields
-	  */
+	//configuration
+	 setSize(1100,600);
 	 
-	
-	 
-	 setSize(1100,500);
-	 getParent().setLocation(100,100);
+	 //initialiting textfields & textareas
      mStat = new TextField(150);
      mStat.setEditable(false);
      
-     m1 = new TextField(150);
-     m2 = new TextField(150);
-     m3 = new TextField(150);
-     m4 = new TextField(150);
-     m5 = new TextField(150);
-     m6 = new TextField(150);
-     
+     m1 = new TextField(120);
+     m2 = new TextField(120);
+     m3 = new TextField(120);
+     m4 = new TextField(120);
+     m5 = new TextField(120);
+     m6 = new TextField(120);
      mquery = new TextArea(10,150);
      mRes = new TextArea(10,150);
      mRes.setEditable(false);
     
-     
-     
-     /**
-      * First we define the buttons, then we add to the Applet, finally add and ActionListener 
-      * (with a self-reference) to capture the user actions.  
-      */
+   //initialiting Buttons
      b1 = new Button("CONNECT");
      b2 = new Button("DISCONNECT");
      b3 = new Button("QUERY");
@@ -83,30 +93,66 @@ TextArea mRes,mquery;
      btn_parcour = new Button("Parcour");
      btn_salle = new Button("Salle");
      btn_seance = new Button("Seance");
-     
      btn_submit= new Button("Executer");
      btn_add = new Button("Ajouter");
-     add(b1) ;
-     add(b2) ;
-     add(b3) ;
-     add(b4);
+     // buttons_sizes
+     b1.setPreferredSize(new Dimension(100,40));
+     b2.setPreferredSize(new Dimension(100,40));
+     b3.setPreferredSize(new Dimension(100,40));
+     b4.setPreferredSize(new Dimension(100,40));
+     btn_add.setPreferredSize(new Dimension(100,40));
+     btn_enseingnant.setPreferredSize(new Dimension(100,40));
+     btn_etudiant.setPreferredSize(new Dimension(100,40));
+     btn_matiere.setPreferredSize(new Dimension(100,40));
+     btn_parcour.setPreferredSize(new Dimension(100,40));
+     btn_salle.setPreferredSize(new Dimension(100,40));
+     btn_seance.setPreferredSize(new Dimension(100,40));
+     btn_submit.setPreferredSize(new Dimension(100,40));
+     //buttons actionListner
      b1.addActionListener(this);
      b2.addActionListener(this);
      b3.addActionListener(this);
      b4.addActionListener(this);
      
+     
+     // Top panel 
+     JPanel top = new JPanel();
+     top.setBackground(Color.white);
+     top.add(b1) ;
+     top.add(b2) ;
+     top.add(b3) ;
+     top.add(b4);
+    
+     
+     // initializing the applet
+     add(top,BorderLayout.NORTH);
      add(mStat,BorderLayout.CENTER);
-//     add(m1);
-//     add(m2);
-//     add(m3);
-//     m1.setText("Name (e.g. John Smith) - Please enter here!");  //According to the database schema
-//     m2.setText("Age (e.g. 23)  - Please enter here!"); //According to the database schema
-//     m3.setText("Color of the eye (e.g. green) - Please enter here!");  //According to the database schema
-     conn=null;
      b2.setEnabled(false);
      b3.setEnabled(false);
      b4.setEnabled(false);
+     conn=null;
      setStatus("Waiting for user actions.");
+     
+     
+     
+     
+     
+     
+     
+        query_panel = new JPanel();
+		query_panel.setBackground(Color.white);
+	    query_panel.setLayout(new BoxLayout(query_panel, BoxLayout.PAGE_AXIS));
+	    query_panel.add(input_label);
+	    query_panel.add(mquery);
+	    query_panel.add(mquery_label);
+	    query_panel.add(mRes);
+		mRes.setText("Query results");
+		JPanel submit_panel = new JPanel();
+		submit_panel.setBackground(Color.white);
+		submit_panel.add(btn_submit);
+		btn_submit.addActionListener(this);
+		query_panel.add(submit_panel);
+     
                 
  }
  
@@ -159,10 +205,12 @@ TextArea mRes,mquery;
      if (cause == btn_enseingnant)
      {
     	 remove_all();
+    	 
     	 insertDatabase();
-    	 m1.setText("Nom"); // m1.setInputPrompt("hint"); 
-    	 add(m1);
+    	 m2.setText("First Name"); 
+    	 m1.setText("Last Name");
     	 add(m2);
+    	 add(m1);
     	 add(btn_add);
     	 table="Enseignant";
     	 validate();
@@ -173,9 +221,11 @@ TextArea mRes,mquery;
      {
     	 remove_all();
     	 insertDatabase();
+    	 m1.setText("Student Number");
+    	 m3.setText("First Name");
     	 add(m1);
-    	 add(m2);
     	 add(m3);
+    	 add(m2);
     	 add(m4);
     	 add(btn_add);
     	 table="Etudiant";
@@ -220,7 +270,7 @@ TextArea mRes,mquery;
      {
     	 remove_all();
     	 insertDatabase();
-    	 add(m1);
+    	 add(liste_salle);
     	 add(m2);
     	 add(m3);
     	 add(m4);
@@ -228,6 +278,7 @@ TextArea mRes,mquery;
     	 add(m6);
     	 add(btn_add);
     	 table="Seance";
+    	 combobox_update();
     	 validate();
      }
      
@@ -306,13 +357,7 @@ private void queryDatabase(){
 	{
 		setStatus("Querying the database");
 		remove_all();
-		add(input_label);
-		add(mquery);
-		add(mquery_label);
-		add(mRes);
-		mRes.setText("Query results");
-		add(btn_submit);
-		btn_submit.addActionListener(this);
+		add(query_panel,BorderLayout.AFTER_LAST_LINE);
 		validate();
 				
 	}
@@ -353,11 +398,7 @@ private void insertDatabase(){
 
 private void remove_all()
 {
-	remove(mRes);
-	remove(mquery);
-	remove(mquery_label);
-	remove(btn_submit);
-	remove(input_label);
+	remove(query_panel);
 	remove(m1);
 	remove(m2);
 	remove(m3);
@@ -371,6 +412,9 @@ private void remove_all()
 	remove(btn_parcour);
 	remove(btn_salle);
 	remove(btn_seance);
+	remove(lname);
+	remove(liste_enseignat);
+	remove(liste_salle);
 	
 	
 	
@@ -413,11 +457,46 @@ private void execute_insertion()
 		setStatus("Insertion to table '"+table+"' successful");
 	} catch (SQLException e) {
 		setStatus("Error Insertion");
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 	
 }
+
+private void combobox_update()
+{
+	try {
+		st=conn.createStatement();
+		String sql="select nom, prenom from Enseignant";
+		ResultSet rs=st.executeQuery(sql);
+		while(rs.next())
+		{	
+			liste_enseignat.addItem(rs.getString(1)+" "+rs.getString(2));
+		}
+	} catch (SQLException e) {
+		setStatus("DATABASE CONNEXION PROBLEM !! combobox_update");
+		System.err.println(e.getMessage());
+	}
+	
+//************************************************	
+	
+	try {
+		st=conn.createStatement();
+		String sql="select * from Salle";
+		ResultSet rs=st.executeQuery(sql);
+		while(rs.next())
+		{	
+			liste_salle.addItem(rs.getString(2));
+		}
+	} catch (SQLException e) {
+		setStatus("DATABASE CONNEXION PROBLEM !! combobox_update");
+		System.err.println(e.getMessage());
+	}
+	
+	
+	
+}
+
+
 
 
 }
