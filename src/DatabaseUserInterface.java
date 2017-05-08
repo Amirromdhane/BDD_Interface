@@ -14,9 +14,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -43,13 +41,12 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 	// textfields & textareas
 	private TextField mStat, m1, m2, m3;
 	private TextArea mRes, mquery;
-	DateFormat format = new SimpleDateFormat("dd/MM/yyyy'T'hh:mm");
-	private JFormattedTextField date_deb,date_fin;
-	
+	private JFormattedTextField date_deb, date_fin;
 
 	// buttons
 	private Button b1, b2, b3, b4, btn_submit, btn_add;
 	private Button btn_etudiant, btn_enseingnant, btn_salle, btn_matiere, btn_groupe, btn_seance, btn_affiliation;
+	private Button aff_etudiant, aff_enseingnant, aff_salle, aff_matiere, aff_groupe, aff_seance, aff_affiliation;
 
 	// Labels
 	Label mquery_label = new Label("Query results: ", Label.CENTER);
@@ -64,7 +61,7 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 	JComboBox<String> liste_type;
 
 	// Panels
-	JPanel query_panel, insert_panel, insert_fields_panel;
+	JPanel query_panel, insert_panel, insert_fields_panel,affiche_panel;
 
 	// Database variables
 	Connection conn;
@@ -86,8 +83,8 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		m1 = new TextField(120);
 		m2 = new TextField(120);
 		m3 = new TextField(120);
-		date_deb= new JFormattedTextField(format);
-		date_fin= new JFormattedTextField(format);
+		date_deb = new JFormattedTextField();
+		date_fin = new JFormattedTextField();
 		mquery = new TextArea(10, 150);
 		mRes = new TextArea(10, 150);
 		mRes.setEditable(false);
@@ -104,10 +101,17 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		btn_salle = new Button("Salle");
 		btn_seance = new Button("Seance");
 		btn_affiliation = new Button("Affiliation Etudiant");
+		aff_enseingnant = new Button("Enseignant");
+		aff_etudiant = new Button("Etudiant");
+		aff_matiere = new Button("Matiere");
+		aff_groupe = new Button("Groupe");
+		aff_salle = new Button("Salle");
+		aff_seance = new Button("Seance");
+		aff_affiliation = new Button("Affiliation Etudiant");
 		btn_submit = new Button("Executer");
 		btn_add = new Button("Ajouter");
 		// buttons_sizes
-		Dimension btn_size=new Dimension(110,40);
+		Dimension btn_size = new Dimension(110, 40);
 		b1.setPreferredSize(btn_size);
 		b2.setPreferredSize(btn_size);
 		b3.setPreferredSize(btn_size);
@@ -120,6 +124,13 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		btn_salle.setPreferredSize(btn_size);
 		btn_affiliation.setPreferredSize(btn_size);
 		btn_seance.setPreferredSize(btn_size);
+		aff_enseingnant.setPreferredSize(btn_size);
+		aff_etudiant.setPreferredSize(btn_size);
+		aff_matiere.setPreferredSize(btn_size);
+		aff_groupe.setPreferredSize(btn_size);
+		aff_salle.setPreferredSize(btn_size);
+		aff_affiliation.setPreferredSize(btn_size);
+		aff_seance.setPreferredSize(btn_size);
 		btn_submit.setPreferredSize(btn_size);
 		// buttons actionListner
 		b1.addActionListener(this);
@@ -133,19 +144,26 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		btn_salle.addActionListener(this);
 		btn_seance.addActionListener(this);
 		btn_affiliation.addActionListener(this);
+		aff_enseingnant.addActionListener(this);
+		aff_etudiant.addActionListener(this);
+		aff_matiere.addActionListener(this);
+		aff_groupe.addActionListener(this);
+		aff_salle.addActionListener(this);
+		aff_seance.addActionListener(this);
+		aff_affiliation.addActionListener(this);
 		btn_submit.addActionListener(this);
 		btn_add.addActionListener(this);
 
 		// initialiting JComboBoxs
-		
+
 		liste_enseignant = new JComboBox<String>();
 		liste_salle = new JComboBox<String>();
 		liste_etudiant = new JComboBox<String>();
 		liste_matiere = new JComboBox<String>();
 		liste_groupe = new JComboBox<String>();
-		liste_type= new JComboBox<String>();
+		liste_type = new JComboBox<String>();
 		// JComboBox_size
-		Dimension jcombo_size=new Dimension(500,20);
+		Dimension jcombo_size = new Dimension(500, 20);
 		liste_enseignant.setPreferredSize(jcombo_size);
 		liste_etudiant.setPreferredSize(jcombo_size);
 		liste_groupe.setPreferredSize(jcombo_size);
@@ -188,18 +206,43 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		submit_panel.add(btn_submit);
 
 		query_panel.add(submit_panel);
-
+		// affiche buttons Panel
+		affiche_panel = new JPanel();
+		affiche_panel.setBackground(Color.white);
+		affiche_panel.setLayout(new BoxLayout(affiche_panel, BoxLayout.X_AXIS));
+		affiche_panel.add(new Label("Racourcis affichage : "));
+		affiche_panel.add(aff_seance);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_etudiant);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_enseingnant);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_matiere);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_salle);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_groupe);
+		affiche_panel.add(Box.createHorizontalStrut(10));
+		affiche_panel.add(aff_affiliation);
+		affiche_panel.add(Box.createVerticalStrut(10));
 		// Insert buttons Panel
 		insert_panel = new JPanel();
 		insert_panel.setBackground(Color.white);
+		insert_panel.setLayout(new BoxLayout(insert_panel, BoxLayout.X_AXIS));
 		insert_panel.add(btn_seance);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_etudiant);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_enseingnant);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_matiere);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_salle);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_groupe);
+		insert_panel.add(Box.createHorizontalStrut(10));
 		insert_panel.add(btn_affiliation);
-
+		insert_panel.add(Box.createVerticalStrut(10));
 		// Insert fields Panel
 		insert_fields_panel = new JPanel();
 		insert_fields_panel.setBackground(Color.white);
@@ -240,7 +283,50 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		if (cause == b4) {
 			insertDatabase();
 		}
-
+		
+		// Button affiche Enseignant
+		if (cause == aff_enseingnant) {
+			mquery.setText("Select * from Enseignant");
+			execute_query();
+		}
+		
+		// Button affiche Etudiant
+		if (cause == aff_etudiant) {
+			mquery.setText("Select * from Etudiant");
+			execute_query();
+		}
+		
+		// Button affiche Matiere
+		if (cause == aff_matiere) {
+			mquery.setText("Select * from Matiere");
+			execute_query();
+		}
+		
+		// Button affiche Salle
+		if (cause == aff_salle) {
+			mquery.setText("Select * from Salle");
+			execute_query();
+		}
+		
+		// Button affiche Seance
+		if (cause == aff_seance) {
+			mquery.setText("Select * from Seance");
+			execute_query();
+		}
+		
+		// Button affiche groupe
+		if (cause == aff_groupe) {
+			mquery.setText("Select * from Groupe");
+			execute_query();
+		}
+		
+		// Button affiche affiliation
+		if (cause == aff_affiliation) {
+			mquery.setText("Select * from Affiliation_etudiant");
+			execute_query();
+		}
+		
+		
 		// Button submit (execute querry)
 		if (cause == btn_submit) {
 			execute_query();
@@ -315,7 +401,7 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 			add_panel.add(btn_add);
 			insert_fields_panel.add(add_panel);
 			add(insert_fields_panel);
-			table = "groupes";
+			table = "Groupe";
 			validate();
 		}
 
@@ -325,6 +411,9 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 			insertDatabase();
 			insert_fields_panel.add(new Label("Identifiant ", Label.LEFT));
 			insert_fields_panel.add(m1);
+			insert_fields_panel.add(Box.createVerticalStrut(10));
+			insert_fields_panel.add(new Label("Type ", Label.LEFT));
+			insert_fields_panel.add(liste_type);
 			insert_fields_panel.add(Box.createVerticalStrut(10));
 			JPanel add_panel = new JPanel();
 			add_panel.setBackground(Color.white);
@@ -355,9 +444,10 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 			insert_fields_panel.add(liste_groupe);
 			insert_fields_panel.add(Box.createVerticalStrut(10));
 			try {
-				 MaskFormatter dateMask = new MaskFormatter("##/##/#### ##:##");
-				dateMask.install(date_deb);
-				dateMask.install(date_fin);
+				MaskFormatter dateMask1 = new MaskFormatter("####-##-## ##:##");
+				MaskFormatter dateMask2 = new MaskFormatter("####-##-## ##:##");
+				dateMask1.install(date_deb);
+				dateMask2.install(date_fin);
 			} catch (ParseException e) {
 				setStatus("ERROR DATE FORMAT");
 			}
@@ -392,7 +482,7 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 			add_panel.add(btn_add);
 			insert_fields_panel.add(add_panel);
 			add(insert_fields_panel);
-			table = "affiliation_Etudiant";
+			table = "Affiliation_etudiant";
 			combobox_update();
 			validate();
 		}
@@ -467,6 +557,7 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		} else {
 			setStatus("Querying the database");
 			remove_all();
+			add(affiche_panel);
 			add(query_panel, BorderLayout.AFTER_LAST_LINE);
 			validate();
 
@@ -495,11 +586,12 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		remove(query_panel);
 		remove(insert_panel);
 		remove(insert_fields_panel);
+		remove(affiche_panel);
 		insert_fields_panel.removeAll();
 		m1.setText("");
 		m2.setText("");
 		m3.setText("");
-		
+
 	}
 
 	private void execute_query() {
@@ -530,29 +622,39 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 		String sql = new String();
 		switch (table) {
 		case "Enseignant":
-			sql = "Insert into " + table + "(nom,prenom) values(\""+m1.getText()+"\",\""+m2.getText()+"\");";
-			System.out.println(sql);
+			sql = "Insert into " + table + "(idEnseignant,nom,prenom) values(default,\"" + m1.getText() + "\",\""
+					+ m2.getText() + "\");";
 			break;
 		case "Etudiant":
-			sql = "Insert into " + table + "(idEtudiant,nom,prenom) values("+m1.getText()+",\""+m2.getText()+"\",\""+m3.getText()+"\");";
-			System.out.println(sql);
+			sql = "Insert into " + table + "(idEtudiant,nom,prenom) values(" + m1.getText() + ",\"" + m2.getText()
+					+ "\",\"" + m3.getText() + "\");";
 			break;
 		case "Matiere":
-			sql = "Insert into " + table + "(idMatiere) values(\""+m1.getText()+"\");";
+			sql = "Insert into " + table + "(idMatiere) values(\"" + m1.getText() + "\");";
 			break;
 		case "Salle":
-			sql = "Insert into " + table + "(idSalle) values(\""+m1.getText()+"\");";
+			sql = "Insert into " + table + "(idSalle,type) values(\"" + m1.getText() + "\",\""
+					+ liste_type.getSelectedItem() + "\");";
 			break;
 		case "Groupe":
-			sql = "Insert into " + table + "(idMatiere) values(\""+m1.getText()+"\");";
+			sql = "Insert into " + table + "(idGroupe) values(\"" + m1.getText() + "\");";
+			break;
+		case "Affiliation_etudiant":
+			String student = (String) liste_etudiant.getSelectedItem();
+			sql = "Insert into " + table + "(Groupe_idGroupe,Etudiant_idEtudiant) values(\""
+					+ liste_groupe.getSelectedItem() + "\",\""
+					+ student.substring(student.indexOf("(") + 1, student.indexOf(")")) + "\");";
 			break;
 		case "Seance":
-			sql = "Insert into " + table + " values(";
-			break;			
-			
-		default:
-			setStatus("ERROR NO TABLE CHOSEN");
+			String teacher = (String) liste_enseignant.getSelectedItem();
+			sql = "Insert into " + table + "(idEnseignant,idMatiere,idSalle,Type,idGroupe,Date_deb,Date_fin) values("
+					+ teacher.substring(teacher.indexOf("(") + 1, teacher.indexOf(")")) + ",\""
+					+ liste_matiere.getSelectedItem() + "\",\"" + liste_salle.getSelectedItem() + "\",\""
+					+ liste_type.getSelectedItem() + "\",\"" + liste_groupe.getSelectedItem() + "\",'"
+					+ date_deb.getText() + "','" + date_fin.getText() + "');";
+			System.out.println(sql);
 			break;
+
 		}
 		try {
 			st = conn.createStatement();
@@ -568,11 +670,11 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 	private void combobox_update() {
 		try {
 			st = conn.createStatement();
-			String sql = "select nom, prenom from Enseignant";
+			String sql = "select * from Enseignant";
 			ResultSet rs = st.executeQuery(sql);
 			liste_enseignant.removeAllItems();
 			while (rs.next()) {
-				liste_enseignant.addItem(rs.getString(1) + " " + rs.getString(2));
+				liste_enseignant.addItem(rs.getString(2) + " " + rs.getString(3) + "(" + rs.getString(1) + ")");
 			}
 		} catch (SQLException e) {
 			setStatus("DATABASE CONNEXION PROBLEM !! combobox_update");
@@ -583,11 +685,11 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 
 		try {
 			st = conn.createStatement();
-			String sql = "select nom, prenom from Etudiant";
+			String sql = "select * from Etudiant";
 			ResultSet rs = st.executeQuery(sql);
 			liste_etudiant.removeAllItems();
 			while (rs.next()) {
-				liste_etudiant.addItem(rs.getString(1) + " " + rs.getString(2));
+				liste_etudiant.addItem(rs.getString(2) + " " + rs.getString(3) + "(" + rs.getString(1) + ")");
 			}
 		} catch (SQLException e) {
 			setStatus("DATABASE CONNEXION PROBLEM !! combobox_update");
