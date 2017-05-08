@@ -651,7 +651,7 @@ public class DatabaseUserInterface extends java.applet.Applet implements ActionL
 					+ teacher.substring(teacher.indexOf("(") + 1, teacher.indexOf(")")) + ",\""
 					+ liste_matiere.getSelectedItem() + "\",\"" + liste_salle.getSelectedItem() + "\",\""
 					+ liste_type.getSelectedItem() + "\",\"" + liste_groupe.getSelectedItem() + "\",'"
-					+ date_deb.getText() + "','" + date_fin.getText() + "');";
+					+ date_deb.getText() + ":00','" + date_fin.getText() + ":00')";
 			System.out.println(sql);
 			break;
 
